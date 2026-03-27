@@ -1,1 +1,2 @@
-python app.py
+python app.py &
+sleep 5
