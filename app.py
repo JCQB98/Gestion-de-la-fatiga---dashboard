@@ -3,6 +3,7 @@ from dash import dcc, html, Input, Output
 import plotly.express as px
 import pandas as pd
 import numpy as np
+import os # IMPORTANTE: Para leer variables de entorno de Binder
 
 # 1. Cargar datos
 df = pd.read_csv('power_nap_vs_coffee_effectiveness_dataset.csv')
@@ -13,8 +14,14 @@ def predecir_alerta(horas_sueno):
     probabilidad = 1 / (1 + np.exp(-log_odds))
     return probabilidad
 
-# 3. Inicializar la App
+# 3. Inicializar la App con soporte para Proxy de Binder
 app = dash.Dash(__name__)
+
+# CONFIGURACIÓN CRÍTICA PARA BINDER:
+if 'JUPYTERHUB_SERVICE_PREFIX' in os.environ:
+    app.config.update({
+        'requests_pathname_prefix': os.environ['JUPYTERHUB_SERVICE_PREFIX'] + 'proxy/8050/'
+    })
 
 # 4. Diseño (Layout)
 app.layout = html.Div([
@@ -37,7 +44,7 @@ app.layout = html.Div([
     
     dcc.Graph(id='scatter-plot'),
 
-    html.Hr(), # Línea divisoria
+    html.Hr(),
 
     html.Div([
         html.H2("Calculadora de Probabilidad de Alerta"),
@@ -68,4 +75,4 @@ def update_prediction(horas):
     return f"Probabilidad de estar 'Bien Alerta' (>=70 pts): {prob*100:.2f}%"
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8050)
+    app.run_server(host='0.0.0.0', port=8050, debug=False)
