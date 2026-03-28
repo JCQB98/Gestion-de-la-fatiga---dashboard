@@ -16,7 +16,7 @@ def predecir_alerta(horas_sueno):
 
 # 3. Inicializar la App con soporte para Proxy de Binder
 app = dash.Dash(__name__)
-
+server = app.server
 # CONFIGURACIÓN CRÍTICA PARA BINDER:
 if 'JUPYTERHUB_SERVICE_PREFIX' in os.environ:
     app.config.update({
@@ -75,4 +75,5 @@ def update_prediction(horas):
     return f"Probabilidad de estar 'Bien Alerta' (>=70 pts): {prob*100:.2f}%"
 
 if __name__ == '__main__':
-    app.run_server(host='0.0.0.0', port=8050, debug=False)
+    port = int(os.environ.get("PORT", 8050))
+    app.run(host='0.0.0.0', port=port)
